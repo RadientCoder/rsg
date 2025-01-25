@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random Scratch Project</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f9;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <button onclick="openRandomProject()">Open Random Project</button>
+
+    <script>
+        function openRandomProject() {
+            // Generate a random number for the Scratch project ID
+            const randomProjectID = Math.floor(Math.random() * 100000000); // Adjust the range as needed
+            
+            // Redirect to the Scratch project page
+            window.location.href = `https://scratch.mit.edu/projects/${randomProjectID}/`;
+        }
+    </script>
+</body>
+</html>
