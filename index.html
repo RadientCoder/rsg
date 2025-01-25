@@ -6,75 +6,85 @@
     <title>Random Scratch Project</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            height: 100vh;
+            font-family: monospace;
+            background-color: black;
+            color: green;
+            overflow: hidden;
             margin: 0;
-            background-color: #f4f4f9;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
         }
         button {
             background-color: #4CAF50;
-            color: white;
+            color: black;
             border: none;
-            padding: 15px 30px;
+            padding: 10px 20px;
             font-size: 16px;
             cursor: pointer;
             border-radius: 5px;
-            margin-bottom: 20px;
+            margin: 20px;
         }
-        button:hover {
-            background-color: #45a049;
-        }
-        #status {
-            font-size: 16px;
-            color: #333;
+        #terminal {
+            width: 100%;
+            height: 100%;
+            padding: 10px;
+            overflow-y: auto;
+            display: none;
         }
     </style>
 </head>
 <body>
-    <button onclick="openRandomProject()">Open Random Project</button>
-    <div id="status">Click the button to start.</div>
+    <button onclick="startSearching()">Open Random Project</button>
+    <div id="terminal"></div>
 
     <script>
-        async function openRandomProject() {
-            const statusElement = document.getElementById('status');
-            statusElement.textContent = 'Loading...';
+        async function startSearching() {
+            const button = document.querySelector('button');
+            const terminal = document.getElementById('terminal');
 
-            const maxAttempts = 10; // Limit attempts for efficiency
-            const knownRanges = [
-                { min: 100000000, max: 110000000 },
-                { min: 200000000, max: 210000000 },
-                { min: 300000000, max: 310000000 }
-            ];
+            // Hide button and show terminal
+            button.style.display = 'none';
+            terminal.style.display = 'block';
 
-            for (let attempt = 0; attempt < maxAttempts; attempt++) {
-                // Pick a random range and generate an ID from it
-                const range = knownRanges[Math.floor(Math.random() * knownRanges.length)];
-                const randomProjectID = Math.floor(range.min + Math.random() * (range.max - range.min));
+            // Begin the search
+            await openRandomProject(terminal);
+        }
+
+        async function openRandomProject(terminal) {
+            const minID = 1;
+            const maxID = 100000;
+
+            function logToTerminal(message) {
+                const newLine = document.createElement('div');
+                newLine.textContent = message;
+                terminal.appendChild(newLine);
+                terminal.scrollTop = terminal.scrollHeight; // Scroll to bottom
+            }
+
+            while (true) {
+                const randomProjectID = Math.floor(minID + Math.random() * (maxID - minID + 1));
                 const url = `https://scratch.mit.edu/projects/${randomProjectID}/`;
 
-                // Update status to show the current project being tested
-                statusElement.textContent = `Testing project ID: ${randomProjectID}`;
+                logToTerminal(`Testing project ID: ${randomProjectID}`);
 
                 try {
-                    // Fetch the project page HTML
                     const response = await fetch(url);
                     const text = await response.text();
 
                     if (response.ok && !text.includes("Whoops! Our server is Scratch'ing its head")) {
-                        statusElement.textContent = `Success! Redirecting to project ID: ${randomProjectID}`;
+                        logToTerminal(`Success! Redirecting to project ID: ${randomProjectID}`);
                         window.open(url, '_blank');
-                        return;
+                        break;
+                    } else {
+                        logToTerminal(`Failed for project ID: ${randomProjectID} (Project not found)`);
                     }
                 } catch (error) {
-                    console.error('Error checking project existence:', error);
+                    logToTerminal(`Failed for project ID: ${randomProjectID} (Network error)`);
                 }
             }
-
-            statusElement.textContent = 'Failed to find a valid project. Please try again.';
         }
     </script>
 </body>
