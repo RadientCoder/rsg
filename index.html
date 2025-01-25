@@ -43,9 +43,17 @@
             const statusElement = document.getElementById('status');
             statusElement.textContent = 'Loading...';
 
+            // Define ranges of project IDs more likely to be valid
+            const knownRanges = [
+                { min: 100000000, max: 110000000 },
+                { min: 200000000, max: 210000000 },
+                { min: 300000000, max: 310000000 }
+            ];
+
             while (true) {
-                // Restrict random number to a smaller known valid range for Scratch projects
-                const randomProjectID = Math.floor(100000000 + Math.random() * 90000000); // Example: Between 100M and 190M
+                // Pick a random range and generate an ID from it
+                const range = knownRanges[Math.floor(Math.random() * knownRanges.length)];
+                const randomProjectID = Math.floor(range.min + Math.random() * (range.max - range.min));
                 const url = `https://scratch.mit.edu/projects/${randomProjectID}/`;
 
                 // Update status to show the current project being tested
@@ -56,12 +64,12 @@
                     const response = await fetch(url);
                     const text = await response.text();
 
-                    if (response.ok && !text.includes('Whoops! Our server is scratching its head')) {
+                    if (response.ok && !text.includes("Whoops! Our server is Scratch'ing its head")) {
                         statusElement.textContent = `Success! Redirecting to project ID: ${randomProjectID}`;
                         window.open(url, '_blank');
                         break;
                     } else {
-                        const reason = text.includes('Whoops! Our server is scratching its head') ? 'Project not found (server error)' : `Error: ${response.status}`;
+                        const reason = text.includes("Whoops! Our server is Scratch'ing its head") ? 'Project not found (server error)' : `Error: ${response.status}`;
                         statusElement.textContent = `Failed for project ID: ${randomProjectID} (${reason}). Trying another...`;
                     }
                 } catch (error) {
