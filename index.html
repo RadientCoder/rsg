@@ -44,8 +44,8 @@
             statusElement.textContent = 'Loading...';
 
             while (true) {
-                // Generate a random number for the Scratch project ID
-                const randomProjectID = Math.floor(Math.random() * 100000000); // Adjust the range as needed
+                // Restrict random number to a smaller known valid range for Scratch projects
+                const randomProjectID = Math.floor(100000000 + Math.random() * 90000000); // Example: Between 100M and 190M
                 const url = `https://scratch.mit.edu/projects/${randomProjectID}/`;
 
                 // Update status to show the current project being tested
@@ -56,9 +56,14 @@
                     const response = await fetch(`https://api.scratch.mit.edu/projects/${randomProjectID}`);
 
                     if (response.ok) {
-                        statusElement.textContent = `Success! Redirecting to project ID: ${randomProjectID}`;
-                        window.open(url, '_blank');
-                        break;
+                        const projectData = await response.json();
+                        if (projectData && projectData.title) {
+                            statusElement.textContent = `Success! Redirecting to project ID: ${randomProjectID}`;
+                            window.open(url, '_blank');
+                            break;
+                        } else {
+                            statusElement.textContent = `Failed for project ID: ${randomProjectID} (Invalid project data). Trying another...`;
+                        }
                     } else {
                         const reason = response.status === 404 ? 'Project not found' : `Error: ${response.status}`;
                         statusElement.textContent = `Failed for project ID: ${randomProjectID} (${reason}). Trying another...`;
