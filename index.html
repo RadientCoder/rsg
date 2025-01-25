@@ -43,14 +43,14 @@
             const statusElement = document.getElementById('status');
             statusElement.textContent = 'Loading...';
 
-            // Define ranges of project IDs more likely to be valid
+            const maxAttempts = 10; // Limit attempts for efficiency
             const knownRanges = [
                 { min: 100000000, max: 110000000 },
                 { min: 200000000, max: 210000000 },
                 { min: 300000000, max: 310000000 }
             ];
 
-            while (true) {
+            for (let attempt = 0; attempt < maxAttempts; attempt++) {
                 // Pick a random range and generate an ID from it
                 const range = knownRanges[Math.floor(Math.random() * knownRanges.length)];
                 const randomProjectID = Math.floor(range.min + Math.random() * (range.max - range.min));
@@ -67,16 +67,14 @@
                     if (response.ok && !text.includes("Whoops! Our server is Scratch'ing its head")) {
                         statusElement.textContent = `Success! Redirecting to project ID: ${randomProjectID}`;
                         window.open(url, '_blank');
-                        break;
-                    } else {
-                        const reason = text.includes("Whoops! Our server is Scratch'ing its head") ? 'Project not found (server error)' : `Error: ${response.status}`;
-                        statusElement.textContent = `Failed for project ID: ${randomProjectID} (${reason}). Trying another...`;
+                        return;
                     }
                 } catch (error) {
-                    statusElement.textContent = `Failed for project ID: ${randomProjectID} (Network error). Trying another...`;
                     console.error('Error checking project existence:', error);
                 }
             }
+
+            statusElement.textContent = 'Failed to find a valid project. Please try again.';
         }
     </script>
 </body>
